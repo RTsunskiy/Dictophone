@@ -19,6 +19,8 @@ public class DictophoneService extends Service {
 
     private static final String CHANNEL_ID = "Channel_1";
     private static final int NOTIFICATION_ID = 1;
+    private RemoteViews notificationLayout;
+    private boolean switcher = true;
 
     private final String STOP = "STOP";
     private final String PLAY = "PLAY";
@@ -27,6 +29,7 @@ public class DictophoneService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+       notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
     }
 
@@ -34,6 +37,22 @@ public class DictophoneService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         startForeground(startId, createNotification());
+
+        if (intent != null && intent.getAction() != null) {
+            String incomeIntent = intent.getAction();
+            switch (incomeIntent) {
+                case PAUSE:
+                    notificationLayout.setImageViewResource(R.id.play_pause_btn,
+                            R.drawable.ic_play_arrow_black_24dp);
+                    updateNotification();
+                    break;
+                case PLAY:
+                    notificationLayout.setImageViewResource(R.id.play_pause_btn,
+                            R.drawable.ic_pause_black_24dp);
+                    updateNotification();
+                    break;
+            }
+        }
 
         return START_NOT_STICKY;
     }
@@ -58,15 +77,24 @@ public class DictophoneService extends Service {
     }
 
     private Notification createNotification() {
-
-        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
-
         Notification customNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_keyboard_voice_black_24dp)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(notificationLayout)
                 .build();
 
+
+            Intent intent = new Intent(this, DictophoneService.class);
+            if (switcher) {
+                intent.setAction(PLAY);
+                switcher = false;
+            }
+            else {
+                intent.setAction(PAUSE);
+                switcher = true;
+            }
+            PendingIntent pending = PendingIntent.getService(this, 0, intent, 0);
+            notificationLayout.setOnClickPendingIntent(R.id.play_pause_btn, pending);
 
         return customNotification;
     }

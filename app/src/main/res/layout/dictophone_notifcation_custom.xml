@@ -19,7 +19,7 @@
         android:id="@+id/play_pause_btn"
         android:background="@color/bacgroundNotification"
         android:padding="@dimen/default_padding"
-        android:src="@drawable/ic_play_arrow_black_24dp" />
+        android:src="@drawable/ic_pause_black_24dp" />
 
     <ImageButton
         android:layout_width="@dimen/voice_image_width_height"

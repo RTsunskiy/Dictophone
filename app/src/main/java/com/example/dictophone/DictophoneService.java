@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -29,7 +28,7 @@ public class DictophoneService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-       notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
+        notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
     }
 
@@ -40,25 +39,22 @@ public class DictophoneService extends Service {
 
         if (intent != null && intent.getAction() != null) {
             String incomeIntent = intent.getAction();
-            switch (incomeIntent) {
-                case PAUSE:
-                    notificationLayout.setImageViewResource(R.id.play_pause_btn,
-                            R.drawable.ic_play_arrow_black_24dp);
-                    updateNotification();
-                    break;
-                case PLAY:
+            if (incomeIntent.equals(PAUSE)) {
+                notificationLayout.setImageViewResource(R.id.play_pause_btn,
+                        R.drawable.ic_play_arrow_black_24dp);
+            }
+            else if (incomeIntent.equals(PLAY)) {
                     notificationLayout.setImageViewResource(R.id.play_pause_btn,
                             R.drawable.ic_pause_black_24dp);
-                    updateNotification();
-                    break;
+                    }
             }
-        }
-
+        updateNotification();
         return START_NOT_STICKY;
     }
 
     private void updateNotification() {
         Notification notification = createNotification();
+
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(NOTIFICATION_ID, notification);
@@ -82,7 +78,6 @@ public class DictophoneService extends Service {
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(notificationLayout)
                 .build();
-
 
             Intent intent = new Intent(this, DictophoneService.class);
             if (switcher) {

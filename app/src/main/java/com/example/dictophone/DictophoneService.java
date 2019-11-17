@@ -6,56 +6,79 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaRecorder;
+import android.os.Binder;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import java.io.File;
+import java.util.Calendar;
 
 public class DictophoneService extends Service {
 
     private static final String CHANNEL_ID = "Channel_1";
     private static final int NOTIFICATION_ID = 1;
+    private static String fileName = null;
+    private final String STOP = "STOP";
+    private final String PLAY_PAUSE = "PLAY/Pause";
     private RemoteViews notificationLayout;
     private boolean switcher = true;
+    private MediaRecorder recorder = null;
+    private IBinder mLocalBinder = new LocalBinder();
 
-    private final String STOP = "STOP";
-    private final String PLAY = "PLAY";
-    private final String PAUSE = "PAUSE";
+
+
+
+    class LocalBinder extends Binder {
+        DictophoneService getBoundService() {
+            return DictophoneService.this;
+        }
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
+        fileName = Environment.getExternalStorageDirectory() + Calendar.getInstance().getTime().toString();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        startForeground(startId, createNotification());
-
         if (intent != null && intent.getAction() != null) {
-            String incomeIntent = intent.getAction();
-            if (incomeIntent.equals(PAUSE)) {
+            if (switcher && intent.getAction() != STOP) {
                 notificationLayout.setImageViewResource(R.id.play_pause_btn,
                         R.drawable.ic_play_arrow_black_24dp);
+                switcher = false;
+                pauseRecording();
+            } else if (!switcher && intent.getAction() != STOP) {
+                notificationLayout.setImageViewResource(R.id.play_pause_btn,
+                        R.drawable.ic_pause_black_24dp);
+                switcher = true;
+                resumeRecording();
             }
-            else if (incomeIntent.equals(PLAY)) {
-                    notificationLayout.setImageViewResource(R.id.play_pause_btn,
-                            R.drawable.ic_pause_black_24dp);
-                    }
+            else if (intent.getAction() == STOP) {
+                stopRecording();
             }
-        updateNotification();
+            updateNotification();
+        } else {
+
+            startForeground(startId, createNotification());
+
+        }
         return START_NOT_STICKY;
     }
 
     private void updateNotification() {
         Notification notification = createNotification();
-
-
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(NOTIFICATION_ID, notification);
     }
@@ -79,24 +102,73 @@ public class DictophoneService extends Service {
                 .setCustomContentView(notificationLayout)
                 .build();
 
-            Intent intent = new Intent(this, DictophoneService.class);
-            if (switcher) {
-                intent.setAction(PLAY);
-                switcher = false;
-            }
-            else {
-                intent.setAction(PAUSE);
-                switcher = true;
-            }
-            PendingIntent pending = PendingIntent.getService(this, 0, intent, 0);
-            notificationLayout.setOnClickPendingIntent(R.id.play_pause_btn, pending);
+        Intent intent = new Intent(this, DictophoneService.class);
+        intent.setAction(PLAY_PAUSE);
+        PendingIntent pending = PendingIntent.getService(this, 0, intent, 0);
+        notificationLayout.setOnClickPendingIntent(R.id.play_pause_btn, pending);
 
+        Intent stopIntent = new Intent(this, MainActivity.class);
+        intent.setAction(STOP);
+        PendingIntent stopPending = PendingIntent.getActivity(this, 0, stopIntent, 0);
+        notificationLayout.setOnClickPendingIntent(R.id.stop_btn, stopPending);
         return customNotification;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        startRecording();
+        return mLocalBinder;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return false;
+    }
+
+    private void startRecording() {
+        try {
+            recorder = new MediaRecorder();
+
+            File outFile = new File(fileName);
+            if (outFile.exists()) {
+                outFile.delete();
+            }
+
+            recorder = new MediaRecorder();
+            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            recorder.setOutputFile(fileName);
+            recorder.prepare();
+            recorder.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopRecording() {
+        if (recorder != null) {
+            recorder.stop();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void pauseRecording() {
+        if (recorder != null) {
+            recorder.pause();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void resumeRecording() {
+        if (recorder != null) {
+            recorder.resume();
+        }
     }
 }

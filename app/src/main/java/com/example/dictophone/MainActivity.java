@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intentStartService = new Intent(MainActivity.this, DictophoneService.class);
                 startService(intentStartService);
+                Intent bindIntent = new Intent(MainActivity.this, DictophoneService.class);
+                bindService(bindIntent, mServiceConnection, BIND_AUTO_CREATE);
             }
         });
 
@@ -98,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (mBoundService != null) {
-        if (mBoundService.getFileName() != null) {
-            myFileList.add(mBoundService.getFileName());
+        if (mBoundService.getFileNameList() != null) {
+            myFileList = mBoundService.getFileNameList();
         }
         if (!myFileList.isEmpty()) {
             initRecyclerView();

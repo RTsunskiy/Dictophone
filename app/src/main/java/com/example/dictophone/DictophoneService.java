@@ -35,6 +35,11 @@ public class DictophoneService extends Service {
     private boolean switcher = true;
     private MediaRecorder recorder;
     private IBinder mLocalBinder = new LocalBinder();
+
+    public List<String> getFileNameList() {
+        return fileNameList;
+    }
+
     private List<String> fileNameList;
 
 
@@ -178,9 +183,7 @@ public class DictophoneService extends Service {
         }
     }
 
-    public String getFileName() {
-        return fileName;
-    }
+
 
 
     private void releaseRecorder() {

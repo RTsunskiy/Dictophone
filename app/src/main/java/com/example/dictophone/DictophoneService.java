@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.widget.RemoteViews;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -20,6 +21,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class DictophoneService extends Service {
@@ -33,14 +35,11 @@ public class DictophoneService extends Service {
     private boolean switcher = true;
     private MediaRecorder recorder;
     private IBinder mLocalBinder = new LocalBinder();
+    private OnButtonClickedChangedListener mOnButtonClickedChangedListener;
 
-    public List<String> getFileNameList() {
-        return fileNameList;
-    }
+
 
     private List<String> fileNameList;
-
-
 
 
     class LocalBinder extends Binder {
@@ -55,7 +54,7 @@ public class DictophoneService extends Service {
         notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
         fileNameList = new ArrayList<>();
-        fileName = Environment.getExternalStorageDirectory() + "/record.3gpp";
+        fileName = Environment.getExternalStorageDirectory() + Calendar.getInstance().getTime().toString();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -77,6 +76,8 @@ public class DictophoneService extends Service {
             else if (intent.getAction() == STOP) {
                 stopRecording();
                 fileNameList.add(fileName);
+
+
             }
             updateNotification();
         } else {
@@ -85,6 +86,8 @@ public class DictophoneService extends Service {
         }
         return START_NOT_STICKY;
     }
+
+
 
     private void updateNotification() {
         Notification notification = createNotification();
@@ -159,12 +162,7 @@ public class DictophoneService extends Service {
         }
     }
 
-    private void stopRecording() {
-        if (recorder != null) {
-            recorder.stop();
-            recorder.release();
-        }
-    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void pauseRecording() {
@@ -182,12 +180,31 @@ public class DictophoneService extends Service {
 
 
 
-
     private void releaseRecorder() {
         if (recorder != null) {
             recorder.release();
             recorder = null;
         }
+    }
+
+
+
+    private void stopRecording() {
+        if (recorder != null) {
+            recorder.stop();
+            recorder.release();
+
+        }
+    }
+
+    public void stopRecord(@NonNull OnButtonClickedChangedListener onButtonClickedChangedListener) {
+        mOnButtonClickedChangedListener = onButtonClickedChangedListener;
+        stopRecording();
+
+    }
+
+    interface onButtonClickedChangedListener {
+        void onButtonChanged(List<String> fileNames);
     }
 
 }

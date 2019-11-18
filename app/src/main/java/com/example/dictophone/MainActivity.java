@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private RecyclerView recyclerView;
     private List<String> myFileList;
-    private File file;
+
 
     private static final String TAG = "BoundService";
 
@@ -90,14 +90,24 @@ public class MainActivity extends AppCompatActivity {
                 bindService(intentStartService, mServiceConnection, BIND_AUTO_CREATE);
             }
         });
-        if (!myFileList.isEmpty()) {
-            initRecyclerView(); }
+
     }
 
-
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        mBoundService.startTimer(new TimerService.OnTimerChangedListener() {
+            @Override
+            public void onTimerChanged(String timerText) {
+                mTimerTextView.setText(timerText);
+            }
+        });
+    }
 
     private void initRecyclerView() {
         MediaAdapter adapter = new MediaAdapter(myFileList);
         recyclerView.setAdapter(adapter);
     }
+
+
 }

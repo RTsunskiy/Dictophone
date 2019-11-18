@@ -76,8 +76,7 @@ public class DictophoneService extends Service {
             else if (intent.getAction() == STOP) {
                 stopRecording();
                 fileNameList.add(fileName);
-
-
+                mOnButtonClickedChangedListener.onButtonChanged(fileNameList);
             }
             updateNotification();
         } else {
@@ -193,17 +192,14 @@ public class DictophoneService extends Service {
         if (recorder != null) {
             recorder.stop();
             recorder.release();
-
         }
     }
 
     public void stopRecord(@NonNull OnButtonClickedChangedListener onButtonClickedChangedListener) {
         mOnButtonClickedChangedListener = onButtonClickedChangedListener;
-        stopRecording();
-
     }
 
-    interface onButtonClickedChangedListener {
+    interface OnButtonClickedChangedListener {
         void onButtonChanged(List<String> fileNames);
     }
 

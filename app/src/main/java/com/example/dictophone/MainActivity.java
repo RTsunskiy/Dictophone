@@ -94,19 +94,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        mBoundService.startTimer(new TimerService.OnTimerChangedListener() {
-            @Override
-            public void onTimerChanged(String timerText) {
-                mTimerTextView.setText(timerText);
-            }
-        });
+    protected void onResume() {
+        super.onResume();
+        initRecyclerView();
     }
 
     private void initRecyclerView() {
-        MediaAdapter adapter = new MediaAdapter(myFileList);
-        recyclerView.setAdapter(adapter);
+        if (mIsServiceBound) {
+        mBoundService.stopRecord(new DictophoneService.OnButtonClickedChangedListener() {
+                                     @Override
+                                     public void onButtonChanged(List<String> fileNames) {
+                                         MediaAdapter adapter = new MediaAdapter();
+                                         adapter.setItems(fileNames);
+                                     }
+        });}
     }
 
 

@@ -3,21 +3,20 @@ package com.example.dictophone;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder> {
 
     private List<String> fileList;
 
-    public MediaAdapter(List<String> fileList) {
-        this.fileList = fileList;
+
+    public void setItems(List<String> fileNames) {
+        fileList.addAll(fileNames);
+        notifyDataSetChanged();
     }
 
     @NonNull

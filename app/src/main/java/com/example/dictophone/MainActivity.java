@@ -3,10 +3,12 @@ package com.example.dictophone;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -17,15 +19,18 @@ import android.view.View;
 import android.widget.Button;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private static final int REQUEST_RECORD_WRITE_AUDIO_PERMISSION = 200;
     private boolean permissionToRecordAccepted = false;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+    private boolean permissionToWriteAccepted = false;
+    private String [] permissions = {Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private RecyclerView recyclerView;
     private List<String> myFileList;
     private File file;
@@ -53,21 +58,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case REQUEST_RECORD_AUDIO_PERMISSION:
-                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                break;
-        }
-        if (!permissionToRecordAccepted ) finish();
+        hasPermissions(this, permissions);
+    }
 
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        myFileList = new ArrayList<>();
 
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+        ActivityCompat.requestPermissions(MainActivity.this,
+                permissions,
+                1);
 
         findViewById(R.id.record_btn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,20 +90,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        String root_sd = Environment.getExternalStorageDirectory().toString();
-        file = new File(root_sd);
-        File[] list = file.listFiles();
-
-        for (File value : Objects.requireNonNull(list)) {
-            myFileList.add(value.getName());
-        }
-
-        initRecyclerView(myFileList);
+        if (!myFileList.isEmpty()) {
+            initRecyclerView(); }
     }
 
-    private void initRecyclerView(List<String> fileName) {
-        MediaAdapter adapter = new MediaAdapter();
-        adapter.setfileNameList(fileName);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mBoundService != null) {
+        if (mBoundService.getFileName() != null) {
+            myFileList.add(mBoundService.getFileName());
+        }
+        if (!myFileList.isEmpty()) {
+            initRecyclerView();
+        }}
+    }
+
+    private void initRecyclerView() {
+        MediaAdapter adapter = new MediaAdapter(myFileList);
         recyclerView.setAdapter(adapter);
     }
 }

@@ -19,19 +19,23 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class DictophoneService extends Service {
 
     private static final String CHANNEL_ID = "Channel_1";
     private static final int NOTIFICATION_ID = 1;
-    private static String fileName = null;
+    private static String fileName;
     private final String STOP = "STOP";
     private final String PLAY_PAUSE = "PLAY/Pause";
     private RemoteViews notificationLayout;
     private boolean switcher = true;
-    private MediaRecorder recorder = null;
+    private MediaRecorder recorder;
     private IBinder mLocalBinder = new LocalBinder();
+    private List<String> fileNameList;
 
 
 
@@ -47,19 +51,21 @@ public class DictophoneService extends Service {
         super.onCreate();
         notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
-        fileName = Environment.getExternalStorageDirectory() + Calendar.getInstance().getTime().toString();
+        fileNameList = new ArrayList<>();
+        fileName = Environment.getExternalStorageDirectory() + "/record.3gpp";
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+            startRecording();
         if (intent != null && intent.getAction() != null) {
-            if (switcher && intent.getAction() != STOP) {
+            if (switcher && intent.getAction() == PLAY_PAUSE) {
                 notificationLayout.setImageViewResource(R.id.play_pause_btn,
                         R.drawable.ic_play_arrow_black_24dp);
                 switcher = false;
                 pauseRecording();
-            } else if (!switcher && intent.getAction() != STOP) {
+            } else if (!switcher && intent.getAction() == PLAY_PAUSE) {
                 notificationLayout.setImageViewResource(R.id.play_pause_btn,
                         R.drawable.ic_pause_black_24dp);
                 switcher = true;
@@ -67,6 +73,7 @@ public class DictophoneService extends Service {
             }
             else if (intent.getAction() == STOP) {
                 stopRecording();
+                fileNameList.add(fileName);
             }
             updateNotification();
         } else {
@@ -117,7 +124,6 @@ public class DictophoneService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        startRecording();
         return mLocalBinder;
     }
 
@@ -131,15 +137,14 @@ public class DictophoneService extends Service {
         return false;
     }
 
-    private void startRecording() {
+    public void startRecording() {
         try {
-            recorder = new MediaRecorder();
+            releaseRecorder();
 
             File outFile = new File(fileName);
             if (outFile.exists()) {
                 outFile.delete();
             }
-
             recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -155,6 +160,7 @@ public class DictophoneService extends Service {
     private void stopRecording() {
         if (recorder != null) {
             recorder.stop();
+            recorder.release();
         }
     }
 
@@ -171,4 +177,17 @@ public class DictophoneService extends Service {
             recorder.resume();
         }
     }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+
+    private void releaseRecorder() {
+        if (recorder != null) {
+            recorder.release();
+            recorder = null;
+        }
+    }
+
 }

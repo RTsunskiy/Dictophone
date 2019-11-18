@@ -16,6 +16,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder>
 
     private List<String> fileList;
 
+    public MediaAdapter(List<String> fileList) {
+        this.fileList = fileList;
+    }
+
     @NonNull
     @Override
     public MediaHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -25,6 +29,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder>
 
     @Override
     public void onBindViewHolder(@NonNull MediaHolder holder, int position) {
+
         final String files = fileList.get(position);
         holder.fileName.setText(files);
     }
@@ -34,9 +39,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder>
         return fileList.size();
     }
 
-    public void setfileNameList(List<String> file) {
-        fileList = file == null ? null : new ArrayList<>(file);
-    }
+
 
     static class MediaHolder extends RecyclerView.ViewHolder {
 

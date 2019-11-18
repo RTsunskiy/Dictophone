@@ -19,9 +19,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class DictophoneService extends Service {
@@ -63,7 +61,7 @@ public class DictophoneService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-            startRecording();
+
         if (intent != null && intent.getAction() != null) {
             if (switcher && intent.getAction() == PLAY_PAUSE) {
                 notificationLayout.setImageViewResource(R.id.play_pause_btn,
@@ -82,9 +80,8 @@ public class DictophoneService extends Service {
             }
             updateNotification();
         } else {
-
+            startRecording();
             startForeground(startId, createNotification());
-
         }
         return START_NOT_STICKY;
     }

@@ -80,33 +80,21 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityCompat.requestPermissions(MainActivity.this,
                 permissions,
-                1);
+                REQUEST_RECORD_WRITE_AUDIO_PERMISSION);
 
         findViewById(R.id.record_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intentStartService = new Intent(MainActivity.this, DictophoneService.class);
                 startService(intentStartService);
-                Intent bindIntent = new Intent(MainActivity.this, DictophoneService.class);
-                bindService(bindIntent, mServiceConnection, BIND_AUTO_CREATE);
+                bindService(intentStartService, mServiceConnection, BIND_AUTO_CREATE);
             }
         });
-
         if (!myFileList.isEmpty()) {
             initRecyclerView(); }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mBoundService != null) {
-        if (mBoundService.getFileNameList() != null) {
-            myFileList = mBoundService.getFileNameList();
-        }
-        if (!myFileList.isEmpty()) {
-            initRecyclerView();
-        }}
-    }
+
 
     private void initRecyclerView() {
         MediaAdapter adapter = new MediaAdapter(myFileList);

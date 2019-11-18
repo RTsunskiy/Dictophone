@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intentStartService = new Intent(MainActivity.this, DictophoneService.class);
                 startService(intentStartService);
-                bindService(intentStartService, mServiceConnection, BIND_AUTO_CREATE);
             }
         });
 
@@ -96,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Intent bindIntent = new Intent(this, DictophoneService.class);
+        bindService(bindIntent, mServiceConnection, BIND_AUTO_CREATE);
         initRecyclerView();
     }
 

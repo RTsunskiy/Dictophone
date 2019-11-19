@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intentStartService = new Intent(MainActivity.this, DictophoneService.class);
                 startService(intentStartService);
+                bindService(intentStartService, mServiceConnection, BIND_AUTO_CREATE);
             }
         });
 
@@ -95,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Intent bindIntent = new Intent(this, DictophoneService.class);
-        bindService(bindIntent, mServiceConnection, BIND_AUTO_CREATE);
+
         initRecyclerView();
     }
 
@@ -105,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
         mBoundService.stopRecord(new DictophoneService.OnButtonClickedChangedListener() {
                                      @Override
                                      public void onButtonChanged(List<String> fileNames) {
+                                         recyclerView = findViewById(R.id.media_recycler);
+                                         LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false);
+                                         recyclerView.setLayoutManager(layoutManager);
                                          MediaAdapter adapter = new MediaAdapter();
                                          adapter.setItems(fileNames);
                                      }

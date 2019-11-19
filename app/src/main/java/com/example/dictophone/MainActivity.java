@@ -103,15 +103,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         if (mIsServiceBound) {
-        mBoundService.stopRecord(new DictophoneService.OnButtonClickedChangedListener() {
-                                     @Override
-                                     public void onButtonChanged(List<String> fileNames) {
-                                         recyclerView = findViewById(R.id.media_recycler);
-                                         LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false);
-                                         recyclerView.setLayoutManager(layoutManager);
-                                         MediaAdapter adapter = new MediaAdapter();
-                                         adapter.setItems(fileNames);
-                                     }
+        mBoundService.stopRecord(fileNames -> {
+            recyclerView = findViewById(R.id.media_recycler);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false);
+            recyclerView.setLayoutManager(layoutManager);
+            MediaAdapter adapter = new MediaAdapter();
+            adapter.setItems(fileNames);
         });}
     }
 

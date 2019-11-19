@@ -54,7 +54,7 @@ public class DictophoneService extends Service {
         notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
         fileNameList = new ArrayList<>();
-        fileName = Environment.getExternalStorageDirectory() + Calendar.getInstance().getTime().toString();
+        fileName = Environment.getExternalStorageDirectory() + "/record.3gpp";
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -191,7 +191,6 @@ public class DictophoneService extends Service {
     private void stopRecording() {
         if (recorder != null) {
             recorder.stop();
-            recorder.release();
         }
     }
 

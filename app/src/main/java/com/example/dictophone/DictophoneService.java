@@ -65,7 +65,7 @@ public class DictophoneService extends Service {
         Random generator = new Random();
         int n = 10000;
         n = generator.nextInt(n);
-        fileName = myRecords.toString() + "/recorder" + n + ".3gpp";
+        fileName = myRecords.toString() + "/recorder" + n + ".aac";
         if (intent != null && intent.getAction() != null) {
             if (switcher && intent.getAction() == PLAY_PAUSE) {
                 notificationLayout.setImageViewResource(R.id.play_pause_btn,
@@ -155,8 +155,8 @@ public class DictophoneService extends Service {
             }
             recorder = new MediaRecorder();
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             recorder.setOutputFile(fileName);
             recorder.prepare();
             recorder.start();

@@ -3,4 +3,5 @@
     <string name="notification_channel_name">Channel Name</string>
     <string name="record_string">Запись</string>
     <string name="notification_channel_description">Channel Description</string>
+    <string name="file_name">Нажмите на имя файла</string>
 </resources>

@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="bacgroundNotification">#feffab</color>
+    <color name="bacgroundPlayButton">#fef00b</color>
+    <color name="white_color">#d2dce7</color>
 </resources>

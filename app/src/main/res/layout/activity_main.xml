@@ -8,13 +8,48 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@id/choosen_file"
         android:id="@+id/media_recycler"/>
 
-    <Button
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_above="@id/record_btn"
+        android:hint="@string/file_name"
+        android:layout_alignParentEnd="true"
+        android:padding="@dimen/default_padding"
+        android:background="@color/bacgroundPlayButton"
+        android:layout_height="wrap_content"
+        tools:text="text"
+        android:id="@+id/choosen_file"/>
+
+    <ImageButton
+        android:layout_width="50dp"
         android:layout_height="@dimen/voice_image_width_height"
         android:layout_alignParentBottom="true"
+        android:id="@+id/play_btn"
+        android:padding="@dimen/default_padding"
+        android:background="@color/bacgroundPlayButton"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        />
+
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="@dimen/voice_image_width_height"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/stop_btn"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_toRightOf="@id/play_btn"
+        android:background="@color/bacgroundPlayButton"
+        android:src="@drawable/ic_stop_black_24dp"
+        />
+
+    <Button
+        android:layout_width="500dp"
+        android:layout_height="@dimen/voice_image_width_height"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/stop_btn"
         android:id="@+id/record_btn"
         android:padding="@dimen/default_padding"
         android:background="@color/bacgroundNotification"

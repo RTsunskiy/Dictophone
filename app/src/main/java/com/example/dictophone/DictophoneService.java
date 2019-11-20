@@ -13,7 +13,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.widget.RemoteViews;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -21,8 +20,8 @@ import androidx.core.app.NotificationManagerCompat;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 public class DictophoneService extends Service {
 
@@ -35,7 +34,8 @@ public class DictophoneService extends Service {
     private boolean switcher = true;
     private MediaRecorder recorder;
     private IBinder mLocalBinder = new LocalBinder();
-    private OnButtonClickedChangedListener mOnButtonClickedChangedListener;
+    private File myRecords;
+
 
 
 
@@ -54,13 +54,18 @@ public class DictophoneService extends Service {
         notificationLayout = new RemoteViews(getPackageName(), R.layout.dictophone_notifcation_custom);
         createNotificationChannel();
         fileNameList = new ArrayList<>();
-        fileName = Environment.getExternalStorageDirectory() + "/record.3gpp";
+        myRecords = new File(Environment.getExternalStorageDirectory() + "/myRecords");
+        if (!myRecords.exists()) {
+            myRecords.mkdir();}
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        fileName = myRecords.toString() + "/recorder" + n + ".3gpp";
         if (intent != null && intent.getAction() != null) {
             if (switcher && intent.getAction() == PLAY_PAUSE) {
                 notificationLayout.setImageViewResource(R.id.play_pause_btn,
@@ -76,7 +81,6 @@ public class DictophoneService extends Service {
             else if (intent.getAction() == STOP) {
                 stopRecording();
                 fileNameList.add(fileName);
-                mOnButtonClickedChangedListener.onButtonChanged(fileNameList);
             }
             updateNotification();
         } else {
@@ -193,13 +197,4 @@ public class DictophoneService extends Service {
             recorder.stop();
         }
     }
-
-    public void stopRecord(@NonNull OnButtonClickedChangedListener onButtonClickedChangedListener) {
-        mOnButtonClickedChangedListener = onButtonClickedChangedListener;
-    }
-
-    interface OnButtonClickedChangedListener {
-        void onButtonChanged(List<String> fileNames);
-    }
-
 }

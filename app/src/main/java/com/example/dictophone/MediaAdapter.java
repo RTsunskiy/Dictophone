@@ -12,10 +12,12 @@ import java.util.List;
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder> {
 
     private List<String> fileList;
+    private TextView mTv;
 
 
-    public void setItems(List<String> fileNames) {
-        fileList.addAll(fileNames);
+    public void setItems(List<String> fileNames, TextView tv) {
+        mTv = tv;
+        fileList = fileNames;
         notifyDataSetChanged();
     }
 
@@ -28,9 +30,13 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder>
 
     @Override
     public void onBindViewHolder(@NonNull MediaHolder holder, int position) {
-
         final String files = fileList.get(position);
         holder.fileName.setText(files);
+        holder.fileName.setOnClickListener(v -> {
+            if (mTv != null) {
+                mTv.setText(fileList.get(position));
+            }
+        });
     }
 
     @Override

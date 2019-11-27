@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements FileChoosenListen
     public static final int MSG_PLAY_RECORD = 202;
     public static final int MSG_STOP_RECORD = 203;
     public static final String EXTRA_PLAYER = "EXTRA_PLAYER";
+    private final String root_sd = Environment.getExternalStorageDirectory() + "/myRecords";
     private static final int REQUEST_RECORD_WRITE_AUDIO_PERMISSION = 200;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -139,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements FileChoosenListen
     }
 
     private void initRecyclerView() {
-        String root_sd = Environment.getExternalStorageDirectory() + "/myRecords";
         file = new File(root_sd);
 
         File[] list = file.listFiles();

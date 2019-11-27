@@ -25,6 +25,7 @@
         </activity>
 
         <service android:name=".DictophoneService" />
+        <service android:name=".PlayService" />
 
     </application>
 

@@ -33,20 +33,10 @@ public class DictophoneService extends Service {
     private RemoteViews notificationLayout;
     private boolean switcher = true;
     private MediaRecorder recorder;
-    private IBinder mLocalBinder = new LocalBinder();
     private File myRecords;
 
 
-
-
     private List<String> fileNameList;
-
-
-    class LocalBinder extends Binder {
-        DictophoneService getBoundService() {
-            return DictophoneService.this;
-        }
-    }
 
     @Override
     public void onCreate() {
@@ -56,7 +46,8 @@ public class DictophoneService extends Service {
         fileNameList = new ArrayList<>();
         myRecords = new File(Environment.getExternalStorageDirectory() + "/myRecords");
         if (!myRecords.exists()) {
-            myRecords.mkdir();}
+            myRecords.mkdir();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -77,8 +68,7 @@ public class DictophoneService extends Service {
                         R.drawable.ic_pause_black_24dp);
                 switcher = true;
                 resumeRecording();
-            }
-            else if (intent.getAction() == STOP) {
+            } else if (intent.getAction() == STOP) {
                 stopRecording();
                 fileNameList.add(fileName);
             }
@@ -89,8 +79,6 @@ public class DictophoneService extends Service {
         }
         return START_NOT_STICKY;
     }
-
-
 
     private void updateNotification() {
         Notification notification = createNotification();
@@ -132,7 +120,7 @@ public class DictophoneService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return mLocalBinder;
+        return null;
     }
 
     @Override
@@ -165,8 +153,6 @@ public class DictophoneService extends Service {
         }
     }
 
-
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void pauseRecording() {
         if (recorder != null) {
@@ -181,8 +167,6 @@ public class DictophoneService extends Service {
         }
     }
 
-
-
     private void releaseRecorder() {
         if (recorder != null) {
             recorder.release();
@@ -190,11 +174,11 @@ public class DictophoneService extends Service {
         }
     }
 
-
-
     private void stopRecording() {
         if (recorder != null) {
             recorder.stop();
         }
     }
+
+
 }

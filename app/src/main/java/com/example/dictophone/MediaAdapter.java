@@ -7,17 +7,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder> {
 
     private List<String> fileList;
-    private TextView mTv;
+    private FileChoosenListener listener;
 
 
-    public void setItems(List<String> fileNames, TextView tv) {
-        mTv = tv;
+    public void setItems(List<String> fileNames, FileChoosenListener listener) {
         fileList = fileNames;
+        this.listener = listener;
         notifyDataSetChanged();
     }
 
@@ -33,9 +34,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder>
         final String files = fileList.get(position);
         holder.fileName.setText(files);
         holder.fileName.setOnClickListener(v -> {
-            if (mTv != null) {
-                mTv.setText(fileList.get(position));
-            }
+            listener.setFileName(fileList.get(position));
         });
     }
 
@@ -43,7 +42,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaHolder>
     public int getItemCount() {
         return fileList.size();
     }
-
 
 
     static class MediaHolder extends RecyclerView.ViewHolder {
